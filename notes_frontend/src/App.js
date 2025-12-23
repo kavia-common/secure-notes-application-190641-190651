@@ -4,14 +4,11 @@ import "./App.css";
 import "./theme.css";
 
 import { NavBar } from "./components/NavBar";
-import { ProtectedRoute } from "./components/ProtectedRoute";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ToastProvider } from "./components/ToastProvider";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { setUnauthorizedHandler } from "./api/client";
 
-import { LoginPage } from "./pages/LoginPage";
-import { SignupPage } from "./pages/SignupPage";
 import { AppPage } from "./pages/AppPage";
 
 function RouterWith401Handler() {
@@ -19,10 +16,11 @@ function RouterWith401Handler() {
   const { logout } = useAuth();
 
   useEffect(() => {
-    // If backend returns 401, clear auth and redirect to login.
+    // Auth UI is temporarily disabled. If backend returns 401, clear auth and
+    // keep the user in the app; AppPage will show an error/toast as appropriate.
     setUnauthorizedHandler(() => {
       logout();
-      navigate("/login", { replace: true });
+      navigate("/app", { replace: true });
     });
   }, [logout, navigate]);
 
@@ -31,16 +29,7 @@ function RouterWith401Handler() {
       <NavBar />
       <Routes>
         <Route path="/" element={<Navigate to="/app" replace />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        <Route
-          path="/app"
-          element={
-            <ProtectedRoute>
-              <AppPage />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/app" element={<AppPage />} />
         <Route path="*" element={<Navigate to="/app" replace />} />
       </Routes>
     </div>

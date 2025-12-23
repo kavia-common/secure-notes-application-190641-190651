@@ -6,15 +6,17 @@ import { useToasts } from "./ToastProvider";
 
 // PUBLIC_INTERFACE
 export function NavBar() {
-  /** Top navigation bar with auth actions. */
-  const { isAuthenticated, logout } = useAuth();
+  /** Top navigation bar. Auth UI is temporarily disabled. */
+  const { logout } = useAuth();
   const navigate = useNavigate();
   const { pushToast } = useToasts();
 
   const onLogout = () => {
+    // Keep logout available for dev/testing (clears token if present),
+    // but do not navigate to /login since auth pages are disabled.
     logout();
-    pushToast({ title: "Logged out", description: "You have been signed out." });
-    navigate("/login", { replace: true });
+    pushToast({ title: "Logged out", description: "Local auth state cleared." });
+    navigate("/app", { replace: true });
   };
 
   return (
@@ -24,30 +26,17 @@ export function NavBar() {
           <div className="brandMark" aria-hidden="true">
             <span style={{ fontWeight: 900, color: "var(--primary)" }}>S</span>
           </div>
-          <Link to={isAuthenticated ? "/app" : "/login"} style={{ color: "inherit" }}>
+          <Link to="/app" style={{ color: "inherit" }}>
             Secure Notes
           </Link>
           <span className="badge">Light theme</span>
         </div>
 
         <div className="navActions">
-          {!isAuthenticated ? (
-            <>
-              <Link className="btn btn-ghost" to="/login">
-                Login
-              </Link>
-              <Link className="btn btn-primary" to="/signup">
-                Signup
-              </Link>
-            </>
-          ) : (
-            <>
-              <span className="badge">Profile</span>
-              <button className="btn btn-danger" onClick={onLogout}>
-                Logout
-              </button>
-            </>
-          )}
+          <span className="badge">Auth disabled</span>
+          <button className="btn btn-ghost" onClick={onLogout} type="button">
+            Clear token
+          </button>
         </div>
       </div>
     </div>
